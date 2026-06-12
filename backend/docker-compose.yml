@@ -3,6 +3,9 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
+
+    restart: unless-stopped
+    
     environment:
       - REVERSE_PROXY_HOST=doco-test.duckdns.org
     volumes:
