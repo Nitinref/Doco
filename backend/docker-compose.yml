@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
 
     restart: unless-stopped
-    
+
     environment:
       - REVERSE_PROXY_HOST=doco-test.duckdns.org
     volumes:
@@ -13,7 +13,7 @@ services:
      - ./public:/public
     ports:
       - '8080:8080'
-      - '80:80'
+      - '8090:80'
     networks:
        - deploy-engine-network
     
