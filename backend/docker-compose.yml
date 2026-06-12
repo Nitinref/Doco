@@ -3,6 +3,8 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
+    environment:
+      - REVERSE_PROXY_HOST=doco-test.duckdns.org
     volumes:
      - /var/run/docker.sock:/var/run/docker.sock
      - ./public:/public
