@@ -13,7 +13,7 @@ services:
      - ./public:/public
     ports:
       - '8080:8080'
-      - '8090:80'
+      - '80:80'
     networks:
        - deploy-engine-network
     
