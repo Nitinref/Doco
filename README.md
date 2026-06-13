@@ -1,256 +1,140 @@
-# 🚀 Doco — Self Hosted Container Deployment Engine
+<div align="center">
 
-A full-stack infrastructure platform that allows users to deploy Docker containers instantly from a web dashboard, automatically generate dynamic subdomains, and access live deployments through an integrated reverse proxy system.
+<img src="https://img.shields.io/badge/-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+<img src="https://img.shields.io/badge/-Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/-Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" />
+<img src="https://img.shields.io/badge/-AWS_EC2-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" />
 
-Inspired by modern deployment platforms like Railway, Render, and Vercel.
+# Doco
 
----
+**Self-hosted container deployment engine.**  
+Deploy Docker containers from a web dashboard. Get a live URL instantly.
 
-## ✨ Features
+[Live Demo](https://docod.duckdns.org) · [Report Bug](https://github.com) · [Request Feature](https://github.com)
 
-* Deploy Docker containers directly from a web interface
-* Pull images dynamically from Docker Hub
-* Automatic container creation using Docker Engine API
-* Dynamic subdomain generation for every deployment
-* Reverse proxy routing based on container hostname
-* Multi-container deployment support
-* Internal Docker network for service isolation
-* Frontend deployed separately with production reverse proxy
-* Process management using PM2
-* Domain mapping using DuckDNS
-* HTTPS secured frontend deployment
-* Real-time deployment feedback in UI
-* One-click container launch system
+</div>
 
 ---
 
-## 🏗 Architecture
+## What it does
 
-```text
-                    ┌──────────────────────────────┐
-                    │  Frontend Instance (EC2)     │
-                    │                              │
-                    │  Next.js Frontend            │
-                    │  PM2 Process Manager         │
-                    │  Nginx Reverse Proxy         │
-                    │  HTTPS Domain                │
-                    │  docod.duckdns.org          │
-                    └──────────────┬───────────────┘
-                                   │
-                                   │ API Requests
-                                   ▼
-                    ┌──────────────────────────────┐
-                    │  Backend Instance (EC2)      │
-                    │                              │
-                    │  Express Management API      │
-                    │  Dockerode Integration       │
-                    │  Reverse Proxy Engine        │
-                    │  Dynamic Domain Routing      │
-                    │  Docker Network Isolation    │
-                    └──────────────┬───────────────┘
-                                   │
-                    ┌──────────────┴───────────────┐
-                    │                              │
-             ┌──────────────┐              ┌──────────────┐
-             │ Container 1  │              │ Container 2  │
-             │ nginx:latest │              │ node:alpine  │
-             │ random.domain│              │ random.domain│
-             └──────────────┘              └──────────────┘
+Doco lets you spin up any Docker container from a browser and immediately access it through a generated subdomain — no CLI, no config files.
+
+```
+Select image → Deploy → ecstatic_keldysh.docod.duckdns.org ✓
 ```
 
 ---
 
-## 🛠 Tech Stack
+## Architecture
 
-### Frontend
-
-* Next.js
-* React
-* TypeScript
-* Tailwind CSS
-* PM2
-* Nginx
-
-### Backend
-
-* Node.js
-* Express.js
-* Dockerode
-* HTTP Proxy
-* Docker Engine API
-
-### Infrastructure
-
-* Docker
-* Docker Compose
-* AWS EC2
-* DuckDNS
-* Reverse Proxy Architecture
-* Linux Server Management
-* HTTPS + SSL
-
----
-
-## How Deployment Works
-
-### Step 1
-
-User selects container image from dashboard.
-
-```text
-nginx:latest
-node:20-alpine
-python:3.12-slim
-redis:7
-mysql:8
 ```
-
-### Step 2
-
-Frontend sends deployment request.
-
-```text
-POST /api/container
-```
-
-### Step 3
-
-Backend checks whether Docker image exists locally.
-
-### Step 4
-
-If image does not exist, Docker Hub image is pulled automatically.
-
-### Step 5
-
-Container is created dynamically.
-
-```javascript
-docker.createContainer()
-```
-
-### Step 6
-
-Container is connected to internal Docker network.
-
-```text
-deploy-engine-network
-```
-
-### Step 7
-
-Dynamic subdomain is generated.
-
-```text
-random_container_name.domain.com
-```
-
-### Step 8
-
-Reverse proxy routes request automatically.
-
-```text
-containerName.domain.com
-            ↓
-Node Reverse Proxy
-            ↓
-Docker Internal Network
-            ↓
-Container
+Browser
+  │
+  │  HTTPS
+  ▼
+┌─────────────────────────────┐
+│  Frontend EC2               │
+│  Next.js · PM2 · Nginx      │
+│  docod.duckdns.org          │
+└──────────────┬──────────────┘
+               │  POST /api/container
+               ▼
+┌─────────────────────────────┐
+│  Backend EC2                │
+│  Express · Dockerode        │
+│  Reverse Proxy Engine       │
+│  Dynamic Domain Routing     │
+└──────────────┬──────────────┘
+               │  docker.createContainer()
+               ▼
+┌─────────────────────────────────────────┐
+│  deploy-engine-network                  │
+│                                         │
+│  ┌────────────┐  ┌────────────┐         │
+│  │ nginx:latest│  │ node:alpine│  ...    │
+│  │ sub1.domain│  │ sub2.domain│         │
+│  └────────────┘  └────────────┘         │
+└─────────────────────────────────────────┘
 ```
 
 ---
 
-## Example Deployment Output
+## How a deployment works
 
-```text
-Container Name:
-ecstatic_keldysh
+| Step | What happens |
+|------|-------------|
+| 1 | User picks an image from the dashboard |
+| 2 | Frontend sends `POST /api/container` |
+| 3 | Backend checks if image exists locally |
+| 4 | If not, pulls automatically from Docker Hub |
+| 5 | Container is created via Docker Engine API |
+| 6 | Container joins `deploy-engine-network` |
+| 7 | A unique subdomain is generated |
+| 8 | Reverse proxy routes traffic to the container |
 
-Generated Domain:
-ecstatic_keldysh.docod.duckdns.org
+---
+
+## Stack
+
+**Frontend** — Next.js, React, TypeScript, Tailwind CSS, PM2, Nginx
+
+**Backend** — Node.js, Express.js, Dockerode, HTTP Proxy, Docker Engine API
+
+**Infrastructure** — Docker, AWS EC2, DuckDNS, HTTPS/SSL
+
+---
+
+## Supported images
+
+```bash
+nginx:latest        node:20-alpine
+python:3.12-slim    redis:7
+mysql:8             # any public Docker Hub image
 ```
 
 ---
 
-## Key Engineering Challenges Solved
+## Local setup
 
-### Dynamic Reverse Proxy Routing
+```bash
+# Clone
+git clone https://github.com/your-username/doco
+cd doco
 
-Routing requests dynamically based on hostname.
+# Backend
+cd backend && npm install
+node index.js
 
-```javascript
-const containerName = req.hostname.split('.')[0]
+# Frontend
+cd frontend && npm install
+npm run dev
 ```
 
----
-
-### Docker Network Isolation
-
-Each deployment connected to internal network.
-
-```text
-deploy-engine-network
-```
+> Make sure Docker is running on your machine before starting the backend.
 
 ---
 
-### Automated Docker Image Pulling
+## Roadmap
 
-Automatically fetch missing Docker images.
-
-```javascript
-docker.pull()
-```
-
----
-
-### Multi Container Architecture
-
-Multiple isolated containers running simultaneously.
-
-```text
-nginx
-node
-python
-redis
-mysql
-```
-
----
-
-### Production Deployment
-
-* Separate frontend and backend EC2 instances
-* PM2 process management
-* Nginx reverse proxy
-* HTTPS secured frontend deployment
-
----
-
-## Future Improvements
-
-* GitHub Repository Deployment
-* Dockerfile Support
-* Deployment Logs Viewer
-* User Authentication
-* Deployment History Database
-* One Click Stop/Delete Deployment
-* Kubernetes Integration
-* Resource Monitoring Dashboard
+- [ ] GitHub repo deployment
+- [ ] Dockerfile support
+- [ ] Deployment logs viewer
+- [ ] User authentication
+- [ ] One-click stop / delete
+- [ ] Kubernetes integration
+- [ ] Resource monitoring dashboard
 
 ---
 
 ## Inspiration
 
-Inspired by modern cloud deployment platforms:
-
-* Railway
-* Render
-* Vercel
+Built independently, inspired by [Railway](https://railway.app), [Render](https://render.com), and [Vercel](https://vercel.com).
 
 ---
 
-## Author
+<div align="center">
 
-Built independently as a full-stack infrastructure engineering project focused on container orchestration, deployment automation, and reverse proxy systems.
+Made with focus on container orchestration, deployment automation, and reverse proxy systems.
+
+</div>
