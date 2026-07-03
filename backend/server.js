@@ -39,7 +39,7 @@ proxy.on('error', (err, req, res) => {
 managementApp.use(express.json());
 managementApp.use(express.static(path.resolve('./public')));
 
-// CORS — frontend alag port pe hai
+
 managementApp.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
@@ -51,12 +51,12 @@ managementApp.use((req, res, next) => {
 const MANAGEMENT_API_PORT = process.env.MANAGEMENT_API_PORT ?? 8080;
 const REVERSE_PROXY_HOST = process.env.REVERSE_PROXY_HOST ?? 'localhost';
 
-// ✅ Status route — frontend calls GET /api/status
+
 managementApp.get('/api/status', (req, res) => {
   return res.json({ status: 'Management APIs are up and running' });
 });
 
-// ✅ Containers route — frontend calls GET /api/containers
+
 managementApp.get('/api/containers', async (req, res) => {
   try {
     const containers = await docker.listContainers({ all: true });
@@ -75,7 +75,7 @@ managementApp.get('/api/containers', async (req, res) => {
 });
 
 
-// ✅ Deploy route — frontend calls POST /api/container
+
 managementApp.post('/api/container', async (req, res) => {
   try {
     const { image, tag } = req.body;
